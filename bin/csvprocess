@@ -1,0 +1,47 @@
+#!/perl
+
+#ABSTRACT: command line utility that insert new columns in csv files
+
+package csvprocess;
+
+=head1 DESCRIPTION
+
+Set of useful utilities that works with html and urls
+
+=head1 SYNOPSIS
+
+    csvprocess -f <file_name> -i <method> -i <in_column_name_or_index> -o <out_column_name_or_index> -v
+    
+    csvprocess -f test.csv -i add_email -i 0
+    csvprocess -f test.csv -i add_email -i 0 -o 5 -v
+    
+Column numbering starts from 1, inserted column will have <out_column_name_or_index>
+
+If no third parameter (<out_column_name_or_index>) provided data will be written next column
+
+=cut
+
+use strict;
+use warnings;
+use CSV::Processor;
+use Regexp::Common;
+use Getopt::Long qw(:config auto_help);
+
+my %opts;
+GetOptions (
+    "f|file=s" => \$opts{file},
+    "i|in=s" => \$opts{in_column},
+    "o|out=s" => \$opts{out_column},
+    "p|processor=s" => \$opts{processor},
+    "v|verbose"  => \$opts{verbose}
+) or die("Error in command line arguments\n");
+
+my $bot = CSV::Processor->new( file => $opts{file}, verbose => $opts{verbose} );
+
+if ( $opts{in_column} =~ /$RE{num}{int}/ && !$opts{out_column} ) {
+    $opts{out_column} = $opts{in_column} + 1;
+}
+
+$bot->add_email( $opts{in_column}, $opts{out_column} );
+
+1;
