@@ -6,7 +6,7 @@ package CSV::Processor;
 
 Set of ready-to-use useful csv file processors based on L<Text::AutoCSV> and other third-party modules
 
-Also there is a command line utility, L<csvproces>
+Also there is a command line utility, L<csvprocess>
 
 
 =head1 SYNOPSIS
@@ -16,17 +16,6 @@ Also there is a command line utility, L<csvproces>
     $bot->add_email(5, 6, %params);            # 5 and 6 are column numbers where input and output data located
     
     $bot->add_email('URL', 'EMAIL');  # 'URL' 'EMAIL' are field names where data will be stored
-    
-parameters
-
-    C<file>
-    C<encoding>
-    C<column_names>
-    C<human_numbering>
-    C<eol>
-    C<sep_char>
-    C<prefix>
-    C<verbose>
     
 =head1 AUTHORS
 
@@ -42,17 +31,38 @@ use CSV::Processor::Utils qw( insert_after_index make_prefix);
 use Data::Dumper;
 use feature 'say';
 
+
+=head1 new
+
+Constructor
+
+parameters
+
+    C<file>
+    C<encoding>
+    C<column_names>
+    C<human_numbering>
+    C<eol>
+    C<sep_char>
+    C<prefix>
+    C<verbose>
+
+=cut
+
 sub new {
     my ( $class, %param ) = @_;
     
     my $prefix = $param{prefix} || 'p_' ;
     
+    die "No input file defined" unless ( $param{file} || $param{in_file} );
+    $param{in_file} = $param{file} unless defined $param{in_file};
+    
     # $param{file} processor
     
     my $csv = Text::AutoCSV->new(
-        in_file => $param{file},
+        in_file => $param{in_file},
         encoding => $param{encoding} || 'UTF-8', # || 'windows1251',
-        out_file => make_prefix( $param{file}, $prefix ),
+        out_file => $param{out_file} || make_prefix( $param{in_file}, $prefix ),
         out_encoding => 'UTF-8',
         verbose => $param{verbose} || 0
     );
@@ -66,6 +76,19 @@ sub new {
 sub auto_csv {
     shift->{auto_csv};
 }
+
+=head1 rw_wrapper
+
+Wrapper under L<Text::AutoCSV/set_walker_ar> / L<Text::AutoCSV/field_add_computed>.
+Helper for easy implementing new processor
+
+    $self->rw_wrapper( $in_field, $out_field, sub {
+        my $in_field_value = shift;
+        return do_some( $in_field_value );
+    }, %params );
+
+=cut
+
 
 sub rw_wrapper {
     my ($self, $in_field, $out_field, $callback, %params) = @_;
@@ -101,8 +124,9 @@ sub rw_wrapper {
                     print "In: undef\tOut: undef\n" if $params{verbose};
                 }
                 $row_number++;
+                return $row_arrayed;
             }    
-        )->read();
+        )->write();
         
     } else {
         
@@ -118,13 +142,13 @@ sub rw_wrapper {
                 print 'In: '.$hr->{$in_field}."\t" if $params{verbose};
                 $hr->{$out_field} = $callback->( $hr->{$in_field} );
                 print 'Out : '.$hr->{$out_field}."\n" if $params{verbose};      
-                return $hr;
-        })->read();
+                return $hr->{$out_field};
+        })->write();
         
         
     }
     
-    $self->auto_csv->write();    
+    # $self->auto_csv->write();    
 }
 
 
@@ -156,6 +180,20 @@ sub add_email {
         return $emails_str;
     });
 
+}
+
+=head1 add_same
+
+    $bot->add_same( $in_column, $out_column, value => $f );
+
+Add same value to each row. Value is specified in C<value> param
+
+=cut
+
+sub add_same {
+    my ($self, $in_field, $out_field, %params) = @_;
+    die "Output field is not specified" unless defined $params{value};
+    $self->rw_wrapper( $in_field, $out_field, sub { return $params{value} });
 }
 
 1;
