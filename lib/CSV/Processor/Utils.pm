@@ -48,4 +48,10 @@ sub insert_after_index {
     return 1;
 }
 
+sub leave_only_digits {
+    my $number = shift;
+    $number =~ s/\D//g;
+}
+
+
 1;

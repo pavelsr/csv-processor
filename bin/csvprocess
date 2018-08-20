@@ -19,6 +19,15 @@ Column numbering starts from 1, inserted column will have <out_column_name_or_in
 
 If no third parameter (<out_column_name_or_index>) provided data will be written next column
 
+All available options:
+
+    -f | --file         name of input file
+    -p | --processor    name of method of L<CSV::Processor>
+    -i | --in           number or name of column, data from which will be considered as source
+    -o | --out          number or name of column, where result will be stored
+    -v | --verbose      verbose mode
+    
+    
 =cut
 
 use strict;
@@ -26,6 +35,13 @@ use warnings;
 use CSV::Processor;
 use Regexp::Common;
 use Getopt::Long qw(:config auto_help);
+use feature 'say';
+use Carp;
+use Pod::Usage;
+
+$SIG{__DIE__} = sub {
+    Carp::longmess($_[0]);
+};
 
 my %opts;
 GetOptions (
@@ -36,12 +52,24 @@ GetOptions (
     "v|verbose"  => \$opts{verbose}
 ) or die("Error in command line arguments\n");
 
-my $bot = CSV::Processor->new( file => $opts{file}, verbose => $opts{verbose} );
+say "Verbose mode enabled" if $opts{verbose};
+
+pod2usage() if !defined $opts{file};
+
+if ( !defined $opts{in_column} ) {
+    $opts{in_column} = 6;           # by default ygeo set url in column with index 6
+}
 
 if ( $opts{in_column} =~ /$RE{num}{int}/ && !$opts{out_column} ) {
     $opts{out_column} = $opts{in_column} + 1;
 }
 
-$bot->add_email( $opts{in_column}, $opts{out_column} );
+say "Reading data from column ".$opts{in_column}.", writing data to column ".$opts{out_column} if $opts{verbose};
+
+my $method = $opts{processor};
+say "Processor: CSV::Process::".$method if $opts{verbose};
+
+my $bot = CSV::Processor->new( file => $opts{file}, verbose => $opts{verbose} );
+$bot->$method( $opts{in_column}, $opts{out_column} );
 
 1;
