@@ -6,8 +6,11 @@ package CSV::Processor;
 
 Set of ready-to-use useful csv file processors based on L<Text::AutoCSV> and other third-party modules
 
-Also there is a command line utility, L<csvprocess>
+E.g. from the box you can add email by url using L<Email::Extractor>
 
+Pull requests are welcome ;)
+
+Also this module includes command line utilitie, L<csvprocess> and  L<csvjoin>
 
 =head1 SYNOPSIS
 

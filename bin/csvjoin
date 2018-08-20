@@ -50,9 +50,10 @@ L<Text::CSV::Merge>
     
 =cut
 
+# TO-DO: move business logic to CSV::Processor or separate module and write tests
+
 use strict;
 use warnings;
-# use CSV::Processor;
 # use Regexp::Common;
 use Getopt::Long qw(:config auto_help);
 use feature 'say';
