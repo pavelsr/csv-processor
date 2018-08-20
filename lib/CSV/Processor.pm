@@ -107,7 +107,7 @@ sub rw_wrapper {
     } else {
         
         # try to detect field names automatically
-        my @fields = $csv->get_fields_names();
+        my @fields = $self->auto_csv->get_fields_names();
         
         say "Assuming that you specified column names at in and out parameters" if $params{verbose};
         say "Auto detected field names : ".join (',', @fields) if $params{verbose};
