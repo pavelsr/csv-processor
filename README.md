@@ -4,7 +4,7 @@ CSV::Processor - Set of different methods that adds new columns in csv files
 
 # VERSION
 
-version 0.01
+version 0.03
 
 # SYNOPSIS
 
@@ -37,7 +37,7 @@ Pavel Serkov <pavelsr@cpan.org>
 
 # add\_email
 
-Try to extract email by website column using ["search\_until\_attempts" in Email::Extractor](https://metacpan.org/pod/Email::Extractor#search_until_attempts)
+Try to extract email by website column using ["search\_until\_attempts" in Email::Extractor](https://metacpan.org/pod/Email::Extractor#search_until_attempts) (wrapper for this method)
 
     $bot->add_email(5);
     $bot->add_email(5, 6);
