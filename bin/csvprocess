@@ -14,6 +14,7 @@ Set of useful utilities that works with html and urls
     
     csvprocess -f test.csv -p add_email -i 0
     csvprocess -f test.csv -p add_email -i 0 -o 5 -v
+    csvprocess -f test.csv -p add_email -i EMAIL -v
     
 Column numbering starts from 1, inserted column will have <out_column_name_or_index>
 
