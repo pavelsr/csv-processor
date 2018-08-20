@@ -4,7 +4,7 @@ CSV::Processor - Set of different methods that adds new columns in csv files
 
 # VERSION
 
-version 0.03
+version 1.00
 
 # SYNOPSIS
 
